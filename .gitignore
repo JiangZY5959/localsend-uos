@@ -1,0 +1,4 @@
+*.deb
+build/
+tmp/
+__pycache__/

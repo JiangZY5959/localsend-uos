@@ -1,0 +1,1 @@
+423242dfa1f57dabec3d9c2b4452ed7fb1925161afbc1c78a76766bb777b5766  LocalSend-1.18.2-linux-arm64-uos-glibc228-v2-for-UOS飞腾D3000.deb
