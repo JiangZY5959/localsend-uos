@@ -42,6 +42,12 @@
    真实二进制改名为 `localsend_app.real`，用同名 wrapper 脚本转发，
    这样从菜单、托盘、终端或开机自启动都能生效。
 
+## 下载现成安装包
+
+- **GitHub Release**（推荐）：<https://github.com/JiangZY5959/localsend-uos/releases/tag/v1.18.2-uos2>
+- **GitCode**：仓库 `dist` 分支里直接取 deb
+  <https://gitcode.com/gcw_6ciOFeue/localsend-uos/tree/dist>
+
 ## 安装
 
 ```bash
