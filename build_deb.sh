@@ -3,9 +3,11 @@
 # 用法: bash build_deb.sh <新版 librust_lib_localsend_app.so> <输出 deb 路径>
 set -euo pipefail
 
-BUILD="${BUILD_DIR:-/home/uos/localsend-build}"
+BUILD=/home/uos/localsend-build
 NEW_RUST_SO="${1:?需要新版 librust_lib_localsend_app.so}"
 OUT="${2:-$BUILD/LocalSend-1.18.2-linux-arm-64-uos-glibc228.deb}"
+TOLERANT_PLUGIN="${3:-}"          # 可选：兼容增强版 libdesktop_drop_plugin.so
+VERSION="${VERSION:-1.18.2+64.uos2}"
 PY=/home/uos/.workbuddy/binaries/python/versions/3.13.12/bin/python3
 # 本机 /tmp 为 10MB tmpfs，dpkg-deb 压缩需要大临时空间
 export TMPDIR="$BUILD/tmp"
@@ -38,11 +40,16 @@ exec "$(dirname "$SELF")/localsend_app.real" "$@"
 EOF
 chmod 755 pkg/opt/localsend_app/localsend_app
 
+# 2.6) 拖拽兼容增强插件（可选）：接受 text/plain 等非标准来源
+if [ -n "$TOLERANT_PLUGIN" ]; then
+  install -m 644 "$TOLERANT_PLUGIN" pkg/opt/localsend_app/lib/libdesktop_drop_plugin.so
+fi
+
 # 3) 控制文件：把 libc6 的地板降到 2.28
 SIZE=$(du -sk pkg | cut -f1)
 sed -e "s/^Pre-Depends:.*/Pre-Depends: libc6 (>= 2.28)/" \
     -e "s/^Installed-Size:.*/Installed-Size: $SIZE/" \
-    -e "s/^Version:.*/Version: 1.18.2+64.uos2/" \
+    -e "s/^Version:.*/Version: $VERSION/" \
     DEBIAN_orig/control > pkg/DEBIAN/control
 
 cp DEBIAN_orig/postinst DEBIAN_orig/postrm pkg/DEBIAN/

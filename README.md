@@ -132,3 +132,21 @@ BUILD_DIR=/你的/构建目录 bash build_deb.sh <新.so> <输出deb>
 ```bash
 DISPLAY=:0 localsend_app 2>&1 | head -50
 ```
+
+## 拖拽文件没反应？（v3 修复）
+
+部分应用（微信、WPS、部分桌面/网页拖拽等）拖出文件时**不提供标准的
+`text/uri-list`**，只给 `text/plain` 或私有类型；上游 `desktop_drop` 插件
+只认 `STRING` + uri-list，于是静默拒绝——表现就是"拖进去什么都不显示"。
+
+v3 起替换为兼容增强版插件（`desktop_drop_tolerant.c`，纯 C 自含声明，
+无需 GTK 开发头文件即可重编译）：
+
+- 追加接受 `text/plain`、`UTF8_STRING`、`TEXT`、`COMPOUND_TEXT`、
+  `x-special/gnome-copied-files`、`application/x-kde4-urilist`、`text/x-moz-url`
+- 自动剥离 `gnome-copied-files` 首行的 copy/cut 动作标记
+- 设 `DESKTOP_DROP_DEBUG=1` 启动可在 stderr 看到每次拖拽实际收到的
+  目标类型和数据，便于继续排查
+
+已验证三种来源（uri-list / 纯路径文本 / gnome-copied-files）拖入均正常
+进入发送列表。
